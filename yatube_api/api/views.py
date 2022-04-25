@@ -10,7 +10,8 @@ from django.core.exceptions import PermissionDenied
 from rest_framework.pagination import LimitOffsetPagination
 from .permissions import AuthorOrReadOnly
 
-from rest_framework import viewsets, permissions, filters
+from rest_framework import viewsets, filters
+from rest_framework import mixins
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -64,11 +65,11 @@ class CommentViewSet(viewsets.ModelViewSet):
         return post.comments.all()
 
 
-class FollowViewSet(viewsets.ModelViewSet):
+class FollowViewSet(mixins.ListModelMixin,
+                    mixins.CreateModelMixin,
+                    viewsets.GenericViewSet):
     serializer_class = FollowSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-    pagination_class = None
-    filter_backends = (filters.SearchFilter, )
+    filter_backends = (filters.SearchFilter,)
     search_fields = ('following__username',)
 
     def get_queryset(self):
